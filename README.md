@@ -1,4 +1,4 @@
-Building an Adaptive License Plate Recognition and Restoration System using Multi-Task Deep Learning
+Building an adaptive Vietnamese license plate recognition and retrieval system using multi-task deep learning
 <p align="center">
   <img src="Pipeline.png" alt="pipeline"/>
 </p>
