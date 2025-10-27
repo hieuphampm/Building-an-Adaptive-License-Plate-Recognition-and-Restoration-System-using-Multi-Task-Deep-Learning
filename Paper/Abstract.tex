@@ -29,20 +29,14 @@
 \maketitle
 
 \begin{abstract}
-	Automatic License Plate Recognition (ALPR) are an essential component of intelligent transportation, yet their performance is often significantly degraded by real-world image distortions and regional plate format complexities. This research addresses these challenges by proposing a highly adaptive, multi-task deep learning framework specifically designed for the Vietnamese license plate context. The system targets unique diversity of Vietnamese plates while robustly handling low-quality image inputs.
+	Automatic License Plate Recognition (ALPR) is an essential component of intelligent transportation, yet its performance is often significantly degraded by real-world image distortions and regional plate format complexities. This research addresses these challenges by proposing a highly adaptive, multi-task deep learning framework specifically designed for the Vietnamese license plate context. The system targets the unique diversity of Vietnamese plates while robustly handling low-quality image inputs.
 	
-	The proposed framework operates as a multi-stage, conditional pipeline.	First, a real-time object detection model performs the localization of all license plate instances. The system's core component is a lightweight Quality Assessment Module (QAM), which acts as an intelligent router, analyzing and classifying each detected plate as either "clear" or "degraded".
-	
-	The system's adaptive nature is demonstrated in the subsequent step: "degraded" images are selectively forwarded to a specialized restoration neural network, trained to reverse complex degradation processes such as motion blur, glare, and geometric distortion. "Clear" images bypass this resource-intensive step, thereby optimizing system throughput.
-	
-	Following this conditional restoration, a robust Optical Character Recognition (OCR) model executes the recognition task, transcribing the plate's character string. Finally, the recognized string is used as a query key to an associated database, enabling vehicle information retrieval.
-	
-	This multi-task approach—integrating detection, quality assessment, conditional restoration, and recognition—demonstrates significant accuracy improvements under challenging real-world conditions compared to traditional, non-adaptive pipelines. The system provides a robust and efficient solution for practical ALPR and information retrieval applications within the specific context of Vietnam.
+	The proposed framework operates as a multi-stage, conditional pipeline. First, a real-time object detection model is employed to localize all license plate instances. The core component of the system is a lightweight Quality Assessment Module (QAM), which acts as an intelligent router, analyzing and classifying each detected plate into one of three distinct categories: "clear", "restorable", or "unrestorable". The system's adaptive nature is demonstrated in the subsequent multi-branch routing: "restorable" images are selectively forwarded to a specialized restoration neural network. Conversely, "clear" images bypass this resource-intensive step. Finally, "unrestorable" images are rejected entirely, preventing erroneous processing and optimizing overall system throughput. A robust Optical Character Recognition (OCR) model is then used to transcribe the character string from both "clear" and successfully "restored" plates. Finally, the recognized string is used as a query key for retrieving vehicle information from an associated database. This multi-task approach—integrating detection, quality assessment, conditional restoration, and recognition—demonstrates significant accuracy improvements under challenging real-world conditions compared to traditional, non-adaptive pipelines. The system provides a robust and efficient solution for practical ALPR and information retrieval applications within the specific context of Vietnam.
 
 \end{abstract}
 
 \vspace{0.5em}
 
 \textbf{\small Keywords—}
-License plate recognition, multi-task learning, deep learning, Vietnamese license plate dataset, image retrieval.
+Vietnamese License plate recognition, multi-task learning, deep learning, computer vision, image retrieval.
 \end{document}
