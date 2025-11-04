@@ -4,6 +4,8 @@
 \usepackage[english]{babel}
 \usepackage{mathptmx}
 \usepackage{geometry}
+\usepackage{graphicx}
+
 \usepackage{indentfirst}
 \setlength{\parindent}{15pt}
 
@@ -54,6 +56,12 @@
 	
 	This research specifically addresses the challenges within the Vietnamese license plate context. This environment presents unique regional complexities, including a high diversity of plate formats, various background colors (e.g., white, blue, yellow), differing character layouts. A "one-size-fits-all" ALPR solution is often insufficient to handle this variability, leading to high error rates.
 	
+	\begin{figure}[h]
+		\centering
+		\includegraphics[width=\linewidth, height=1.5cm]{Images/image_1.png}
+		\caption{Overview of the proposed adaptive ALPR pipeline.}
+		\label{fig:pipeline}
+	\end{figure}
 	
 	\section{RELATED WORK}
 	
@@ -65,8 +73,20 @@
 	
 	\subsection*{\textit{B. Image quality assessment and routing}}
 	
-	Although multi-angle models have been explored~\cite{trananh2023}, they do not dynamically assess input quality or selectively restore degraded plates—leading to cascading errors in recognition.
+	Assessing the quality of detected license plate images is crucial for robust ALPR under real-world degradations. No-reference image quality assessment (NR-IQA) methods have gained prominence due to their applicability without pristine references. Early deep learning approaches leveraged CNNs to predict perceptual quality scores~\cite{simone2017,nima2018}, while recent works incorporate geometric priors~\cite{shin2024} or lightweight architectures for efficiency~\cite{lariqa}. These methods, however, are primarily designed for \textit{general image aesthetics or distortion classification}, not for \textit{task-specific routing} in ALPR pipelines.
+	
+	To enable adaptive processing, we require a lightweight classifier capable of categorizing plate images into ``clear'', ``restorable'', or ``unrestorable''. Among candidate backbones—ResNet50, MobileNetV2, and EfficientNet-B0~\cite{efficientnetb0}— \textit{EfficientNet-B0} was selected due to its superior parameter-to-accuracy ratio and proven efficacy in no-reference contrast and distortion assessment. Fine-tuned on a synthetic dataset of Vietnamese license plates with controlled blur, noise, and compression artifacts, our \textit{Quality Assessment Module (QAM)} dynamically routes inputs: clear plates proceed directly to OCR, recoverable plates will be moved to the recovery module, and unrestorable cases are rejected to prevent error propagation.
+	
+	Although multi-angle detection models have been proposed~\cite{trananh2023}, \textit{none integrate real-time quality evaluation with conditional restoration}, resulting in cascading recognition failures under adverse imaging conditions. Our multi-branch design addresses this gap by optimizing both accuracy and computational efficiency.
+	
 	\subsection*{\textit{C. Conditional image restoration}}
+	
+	Restoring degraded license plate images is essential for improving OCR accuracy in low-quality inputs. Classical techniques, such as noise modeling and blur estimation~\cite{maru2017}, rely on hand-crafted priors and perform poorly under complex, compound distortions. Traditional machine learning approaches~\cite{singhal2025} offer marginal improvements but lack generalization. The advent of deep learning has introduced more powerful paradigms: convolutional neural networks (CNNs)~\cite{liu2024,singhal2025} capture local patterns effectively but suffer from limited receptive fields; \textit{Transformer}-based models~\cite{liang2021swinir,agnolucci2022,conde2022swin2sr,singhal2025} excel at modeling long-range dependencies through self-attention, though vanilla Vision Transformers (ViT) incur prohibitive computational cost on high-resolution inputs. Advanced generative methods, including GANs and diffusion models~\cite{singhal2025}, achieve state-of-the-art perceptual quality but risk introducing artifacts (e.g., hallucinated characters) and demand significant resources—unsuitable for real-time ALPR.
+	
+	For conditional restoration in resource-constrained environments, lightweight efficiency and fidelity are paramount. Among \textit{Transformer}-based restoration backbones, \textit{Swin2SR}~\cite{conde2022swin2sr} stands out by combining the hierarchical \textit{Swin Transformer V2} with compressed image super-resolution objectives, enabling efficient processing of low-resolution, blurry, or noisy inputs while preserving textual integrity. Fine-tuned on synthetically degraded Vietnamese license plates, \textit{Swin2SR} is selectively applied only to ``restorable'' images identified by the QAM, bypassing clear plates to minimize latency and preventing artifact-induced OCR failures in unrestorable cases.
+	
+	Despite extensive progress in general image restoration~\cite{singhal2025}, no prior ALPR system integrates task-aware quality routing with conditional, text-preserving restoration. This gap underscores the novelty of our adaptive pipeline.
+	
 	\subsection*{\textit{D. Character recognition and retrieval}}
 	
 	
@@ -74,74 +94,8 @@
 	
 	\section{CONCLUSION}
 	
-	\section{REFERENCES45}	
-	\begin{thebibliography}{99}
-		
-		\bibitem{segmentation2025}
-		Duy Dieu Nguyen, Tan Sang Vo, Manh Hung Le, and Minh Son Nguyen.
-		\textit{An integration of segmentation technique on edge devices for license plate recognition.}
-		VJSTE, vol. 67, no. 1, pp. 3-13, Mar. 2025.
-		
-		\bibitem{openalpr2023}
-		H. Tran, G. Ma, T. Nguyen, and T. Cao.
-		\textit{Building Vietnam's License Plate Recognition System Based on OpenALPR}.
-		International Journal of Multidisciplinary Research and Publications, 
-		ISSN (Online): 2581-6187, 2023.
-		
-		\bibitem{trananh2023}
-		D. Tran-Anh, K. L. Tran, and H.-N. Vu.
-		\textit{License Plate Recognition Based on Multi-Angle View Model}.
-		Preprint, 2023.
-		
-		\bibitem{redmon2016}	
-		J. Redmon, S. Divvala, R. Girshick, and A. Farhadi.
-		\textit{You Only Look Once: Unified, Real-Time Object Detection}.
-		Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR), 2016.
-		
-		\bibitem{topuz2025}
-		Y. Topuz, M. T. Gökcan, S. Yıldız, and S. Varlı.
-		\textit{A Single Detect Focused YOLO Framework for Robust Mitotic Figure Detection}.
-		MIDOG Workshop (workshop presentation), 2025.
-		
-		\bibitem{agnolucci2022}
-		L. Agnolucci, L. Galteri, M. Bertini, and A. Del Bimbo.
-		\textit{Restoration of Analog Videos Using Swin-UNet}.
-		Proceedings of the ACM International Conference on Multimedia (ACM MM), 2022.
-		
-		\bibitem{conde2022}
-		M. V. Conde, U.-J. Choi, M. Burchi, and R. Timofte.
-		\textit{Swin2SR: SwinV2 Transformer for Compressed Image Super-Resolution and Restoration}.
-		ECCV Workshops / LNCS, 2022.
-		
-		\bibitem{shi2017}
-		B. Shi, X. Bai, and C. Yao.
-		\textit{An End-to-End Trainable Neural Network for Image-based Sequence Recognition and Its Application to Scene Text Recognition}.
-		IEEE Transactions on Pattern Analysis and Machine Intelligence (TPAMI), 2017.
-		
-		\bibitem{baena2024}
-		R. Baena, S. Kalleli, and M. Aubry.
-		\textit{General Detection-based Text Line Recognition}.
-		Preprint, 2024.
-		
-		\bibitem{bautista2022}
-		D. Bautista and R. Atienza.
-		\textit{Scene Text Recognition with Permuted Autoregressive Sequence Models}.
-		In Proceedings of the European Conference on Computer Vision (ECCV), 2022.
-		
-		\bibitem{gfpgan2021}
-		X. Wang, Y. Li, H. Zhang, and Y. Shan.
-		\textit{GFP-GAN: Towards Real-World Blind Face Restoration with Generative Facial Prior}.
-		Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR), 2021.
-		
-		\bibitem{suvorov2022}
-		R. Suvorov, E. Logacheva, A. Mashikhin, A. Remizova, A. Ashukha, A. Silvestrov, N. Kong, H. Goka, K. Park, and V. Lempitsky.
-		\textit{Resolution-robust Large Mask Inpainting with Fourier Convolutions}.
-		Proceedings of the IEEE Winter Conference on Applications of Computer Vision (WACV), 2022.
-		
-		\bibitem{masknet2020}
-		H. Zhou et al.
-		\textit{MaskNet: Towards General Instance Segmentation with Mask Conditioning}.
-		Proceedings of the European Conference on Computer Vision (ECCV), 2020.
-		
-	\end{thebibliography}
+	\section{REFERENCES}	
+	%\nocite{*}
+	\bibliographystyle{IEEEtran}   
+	\bibliography{references}  
 \end{document}
