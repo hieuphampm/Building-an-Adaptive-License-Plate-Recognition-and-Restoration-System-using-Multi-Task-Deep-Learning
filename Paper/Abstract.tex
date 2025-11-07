@@ -5,6 +5,9 @@
 \usepackage{mathptmx}
 \usepackage{geometry}
 \usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
 
 \usepackage{indentfirst}
 \setlength{\parindent}{15pt}
@@ -56,28 +59,23 @@
 	
 	This research specifically addresses the challenges within the Vietnamese license plate context. This environment presents unique regional complexities, including a high diversity of plate formats, various background colors (e.g., white, blue, yellow), differing character layouts. A "one-size-fits-all" ALPR solution is often insufficient to handle this variability, leading to high error rates.
 	
-	\begin{figure}[h]
-		\centering
-		\includegraphics[width=\linewidth, height=1.5cm]{Images/image_1.png}
-		\caption{Overview of the proposed adaptive ALPR pipeline.}
-		\label{fig:pipeline}
-	\end{figure}
-	
 	\section{RELATED WORK}
 	
 	The proposed system comprises four sequential yet adaptive stages: (1) license plate detection, (2) image quality assessment and routing, (3) conditional image restoration, and (4) character recognition and retrieval.
 	
 	\subsection*{\textit{A. License plate detection}}
 	
-	Despite these advancements, existing detectors assume relatively clean input images and do not adapt to severe degradations prevalent in Vietnamese traffic surveillance systems, including extreme viewpoint angles, specular glare, motion blur, and low-resolution sensors~\cite{trananh2023}. For instance, while segmentation-based methods on edge devices~\cite{segmentation2025} and OpenALPR adaptations~\cite{openalpr2023} have been proposed for local deployment, they remain vulnerable to real-world distortions. Moreover, none incorporate pre-processing quality assessment to filter or route degraded inputs prior to recognition. This critical limitation motivates our use of YOLOv8-nano—building on the robust real-time detection foundation of YOLO~\cite{redmon2016}—augmented with a novel Quality Assessment Module (QAM) to enable adaptive downstream processing.
+	Despite these advancements, existing detectors assume relatively clean input images and do not adapt to severe degradations prevalent in Vietnamese traffic surveillance systems, including extreme viewpoint angles, specular glare, motion blur, and low-resolution sensors~\cite{TranAnh2023LicensePR}. For instance, while segmentation-based methods on edge devices~\cite{Nguyen2025AnIO} and OpenALPR adaptations~\cite{openalpr2023} have been proposed for local deployment, they remain vulnerable to real-world distortions—particularly under extreme illumination variations such as daytime specular reflections from sunlight and nighttime low-contrast imaging due to poor lighting or headlight glare. Moreover, none incorporate pre-processing quality assessment to filter or route degraded inputs prior to recognition. This critical limitation motivates our use of \textit{YOLOv8-nano} \cite{Yaseen2024WhatIY}—building on the robust real-time detection foundation of YOLO~\cite{redmon2016}—augmented with a novel \textit{Quality Assessment Module (QAM)} to enable adaptive downstream processing.
 	
 	\subsection*{\textit{B. Image quality assessment and routing}}
 	
 	Assessing the quality of detected license plate images is crucial for robust ALPR under real-world degradations. No-reference image quality assessment (NR-IQA) methods have gained prominence due to their applicability without pristine references. Early deep learning approaches leveraged CNNs to predict perceptual quality scores~\cite{simone2017,nima2018}, while recent works incorporate geometric priors~\cite{shin2024} or lightweight architectures for efficiency~\cite{lariqa}. These methods, however, are primarily designed for \textit{general image aesthetics or distortion classification}, not for \textit{task-specific routing} in ALPR pipelines.
 	
-	To enable adaptive processing, we require a lightweight classifier capable of categorizing plate images into ``clear'', ``restorable'', or ``unrestorable''. Among candidate backbones—ResNet50, MobileNetV2, and EfficientNet-B0~\cite{efficientnetb0}— \textit{EfficientNet-B0} was selected due to its superior parameter-to-accuracy ratio and proven efficacy in no-reference contrast and distortion assessment. Fine-tuned on a synthetic dataset of Vietnamese license plates with controlled blur, noise, and compression artifacts, our \textit{Quality Assessment Module (QAM)} dynamically routes inputs: clear plates proceed directly to OCR, recoverable plates will be moved to the recovery module, and unrestorable cases are rejected to prevent error propagation.
+	Illumination extremes pose a particularly acute challenge: daytime glare saturates plate regions, while nighttime captures suffer from noise and low signal-to-noise ratio (SNR). Although specialized enhancement models like \textit{U-Net}-based day/night preprocessing have been explored~\cite{Chowdhury2019ANU}, they are applied uniformly and cannot distinguish between recoverable and irreparable degradation—leading to unnecessary computation or persistent OCR failures.
 	
-	Although multi-angle detection models have been proposed~\cite{trananh2023}, \textit{none integrate real-time quality evaluation with conditional restoration}, resulting in cascading recognition failures under adverse imaging conditions. Our multi-branch design addresses this gap by optimizing both accuracy and computational efficiency.
+	To enable adaptive processing, we require a lightweight, real-time classifier capable of categorizing plate images into ``\textit{clear}'', ``\textit{restorable}'', or ``\textit{unrestorable}''. Among candidate backbones—ResNet50, MobileNetV2~\cite{Sandler2018MobileNetV2IR}, \textit{EfficientNet-B0}~\cite{Tan2019EfficientNetRM}, and \textit{MobileNetV3}~\cite{Qian2021MobileNetV3FI}—\textit{MobileNetV3-Small} was selected due to its superior efficiency on edge devices, achieving 3.2× fewer parameters and 2.8× lower FLOPs than \textit{EfficientNet-B0} while maintaining comparable classification accuracy in no-reference distortion tasks. Fine-tuned on a synthetic dataset of multi Vietnamese license plates with controlled blur, noise, compression, and day/night illumination artifacts, our \textit{Quality Assessment Module (QAM)} dynamically routes inputs: clear plates proceed directly to OCR, restorable ones are forwarded to the conditional restoration module, and unrestorable cases are rejected to prevent error propagation.
+	
+	Although multi-angle detection models have been proposed~\cite{TranAnh2023LicensePR}, \textit{none integrate real-time quality evaluation with conditional, illumination-aware restoration}. Our multi-branch design addresses this gap by optimizing both accuracy and computational efficiency across diurnal cycles.
 	
 	\subsection*{\textit{C. Conditional image restoration}}
 	
@@ -89,13 +87,67 @@
 	
 	\subsection*{\textit{D. Character recognition and retrieval}}
 	
+	Optical Character Recognition (OCR) is the final critical stage of ALPR, converting restored plate images into machine-readable text for database retrieval. Early end-to-end frameworks such as \textit{CRNN}~\cite{Shi2015AnET} combine convolutional feature extraction with recurrent sequence modeling, establishing a lightweight and effective baseline for scene text recognition. Recent advances have explored detection-integrated paradigms: \textit{SwinTextSpotter}~\cite{Huang2022SwinTextSpotterST} synergizes text detection and recognition using a \textit{Swin Transformer} backbone, eliminating the need for character-level annotations or geometric rectification modules—particularly beneficial for arbitrary-shaped text. Similarly, \textit{PARSeq}~\cite{Bautista2022SceneTR} introduces context-aware permutation language modeling to enhance robustness against occlusion and degradation.
+	
+	Despite these innovations, most methods are optimized for general scene text and do not account for the unique typographic and linguistic constraints of Vietnamese license plates, such as fixed-length strings, mixed alphanumeric characters, and regional number variations. Detection-based line recognition~\cite{Baena2024GeneralDT} offers flexibility through pretraining on synthetic character-level data followed by line-level fine-tuning, but introduces complexity unsuitable for real-time embedded deployment. Enhanced \textit{CRNN} variants~\cite{Yu2023SceneTR} and night-specific models~\cite{Chowdhury2019ANU} improve robustness yet lack adaptive integration with upstream quality routing.
+	
+	For our adaptive ALPR pipeline, computational efficiency, deployment simplicity, and proven accuracy on structured text are paramount. We therefore adopt a fine-tuned \textit{CRNN}~\cite{Shi2015AnET,Yu2023SceneTR} as the OCR backbone—trained on a mixed dataset of real and synthetically degraded Vietnamese plates. The recognized string will be saved and serve as a query key to retrieve vehicle metadata (e.g., owner, registration status) from the database, completing the end-to-end retrieval system.
 	
 	\section{METHODOLOGY}
 	
+	Building upon the limitations identified in the related work, this section presents the adaptive multi-task ALPR framework specifically engineered for Vietnamese license plates under real-world imaging constraints. The system dynamically adjusts its processing path based on input quality, eliminating redundant operations while maximizing recognition accuracy.
+	
+	\subsection{\textit{Overall System Architecture}}
+	
+	The proposed pipeline comprises four interdependent modules executed in a conditional, multi-branch manner, as depicted in Fig.~\ref{fig:pipeline}. Unlike conventional rigid ALPR systems that apply uniform processing regardless of input quality, our framework incorporates an intelligent routing mechanism—the \textit{Quality Assessment Module (QAM)}—to classify each detected plate and selectively activate resource-intensive restoration only when necessary.
+	
+	The processing flow is defined as follows:
+	
+	\begin{enumerate}
+		\item \textbf{License Plate Detection}: A real-time \textit{YOLOv8-nano} detector localizes all plate instances in the input frame \cite{TranAnh2023LicensePR,Nguyen2025AnIO}.
+		\item \textbf{Image Quality Assessment and Routing}: The \textit{QAM}, built on \textit{MobileNetV3-Small}, classifies each cropped plate into one of three categories: ``\textit{clear}'', ``\textit{restorable}'', or ``\textit{unrestorable}'' \cite{shin2024, lariqa, Tan2019EfficientNetRM, javad2025}.
+		\item \textbf{Conditional Image Restoration}: Only ``restorable'' plates are processed by a fine-tuned \textit{Swin2SR} model to recover textual fidelity \cite{conde2022swin2sr}.
+		\item \textbf{Character Recognition and Retrieval}: A \textit{CRNN} with CTC decoding transcribes the (restored or original) plate, followed by structured database lookup \cite{Yu2023SceneTR}.
+	\end{enumerate}
+	
+	\begin{figure}[h]
+		\centering
+		\includegraphics[width=\linewidth, height=3cm]{Images/image_1.png}
+		\caption{Block diagram of the proposed adaptive ALPR pipeline. The \textit{QAM} enables conditional routing: clear plates bypass restoration, restorable plates are enhanced via \textit{Swin2SR}, and unrestorable plates are rejected to prevent error propagation.}
+		\label{fig:pipeline}
+	\end{figure}
+	
+	\subsection{\textit License Plate Detection (Module 1)}
+	
+	The primary objective of this module is to accurately localize all license plate instances within a full-frame input image, enabling robust downstream processing under real-world traffic conditions.
+	\begin{itemize}
+		 
+	\item \textbf{Model Selection}: We adopt \textit{YOLOv8-nano}~\cite{Yaseen2024WhatIY} as the detection backbone, building upon the foundational real-time object detection paradigm introduced in YOLO~\cite{redmon2016}. This variant is selected for its optimal trade-off between inference speed and mean Average Precision (mAP) on small, densely packed objects—critical for multi-vehicle scenes in Vietnamese urban environments. Fine-tuning on a diverse dataset of annotated Vietnam traffic images (including day/night, rain, and motion blur) further enhances robustness to regional plate variations and imaging distortions~\cite{Nguyen2025AnIO,TranAnh2023LicensePR}.
+	
+	\item \textbf{Input and Output}: The module accepts a full-resolution input image $I \in \mathbb{R}^{H \times W \times 3}$ and outputs a set of bounding boxes $B = \{(x_{1,i}, y_{1,i}, x_{2,i}, y_{2,i}, c_i)\}_{i=1}^{N}$, where $N$ is the number of detected plates and $c_i$ denotes confidence score. Non-maximum suppression (NMS) with IoU threshold 0.4 eliminates redundant detections.
+	
+	\item \textbf{Data Flow}: For each bounding box $B_i$, the corresponding plate region $P_i = \text{crop}(I, B_i)$ is extracted and resized to a fixed dimension ($128 \times 64$) while preserving aspect ratio via padding. These cropped patches serve as direct input to Module 2: Image Quality Assessment and Routing (QAM), enabling adaptive processing based on degradation severity.
+	\end{itemize}
+	
+	\begin{figure}[h]
+		\centering
+		\includegraphics[width=\linewidth]{Images/image_2.png}
+		\caption{The YOLO detection pipeline~\cite{redmon2016}. The input image is resized, processed through a convolutional backbone, and refined via non-maximum suppression (NMS) to produce confident license plate bounding boxes. This mechanism forms the core of \textit{Module 1}, enabling real-time localization in multi-vehicle scenes.}
+		\label{fig:yolo_pipeline}
+	\end{figure}
+	
+	\subsection{\textit{Image Quality Assessment and Routing (Module 2)}}
+	
+	
+
 	\section{CONCLUSION}
 	
+	
+	
 	\section{REFERENCES}	
-	%\nocite{*}
-	\bibliographystyle{IEEEtran}   
-	\bibliography{references}  
+	\begingroup
+	\renewcommand{\section}[2]{}  
+	\bibliographystyle{ieeetr}
+	\bibliography{references}
+	\endgroup
 \end{document}
