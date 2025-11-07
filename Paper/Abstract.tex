@@ -8,7 +8,7 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{amsfonts}
-
+\usepackage{float}
 \usepackage{indentfirst}
 \setlength{\parindent}{15pt}
 
@@ -110,7 +110,7 @@
 		\item \textbf{Character Recognition and Retrieval}: A \textit{CRNN} with CTC decoding transcribes the (restored or original) plate, followed by structured database lookup \cite{Yu2023SceneTR}.
 	\end{enumerate}
 	
-	\begin{figure}[h]
+	\begin{figure}[H]
 		\centering
 		\includegraphics[width=\linewidth, height=3cm]{Images/image_1.png}
 		\caption{Block diagram of the proposed adaptive ALPR pipeline. The \textit{QAM} enables conditional routing: clear plates bypass restoration, restorable plates are enhanced via \textit{Swin2SR}, and unrestorable plates are rejected to prevent error propagation.}
@@ -129,7 +129,7 @@
 	\item \textbf{Data Flow}: For each bounding box $B_i$, the corresponding plate region $P_i = \text{crop}(I, B_i)$ is extracted and resized to a fixed dimension ($128 \times 64$) while preserving aspect ratio via padding. These cropped patches serve as direct input to Module 2: Image Quality Assessment and Routing (QAM), enabling adaptive processing based on degradation severity.
 	\end{itemize}
 	
-	\begin{figure}[h]
+	\begin{figure}[H]
 		\centering
 		\includegraphics[width=\linewidth]{Images/image_2.png}
 		\caption{The YOLO detection pipeline~\cite{redmon2016}. The input image is resized, processed through a convolutional backbone, and refined via non-maximum suppression (NMS) to produce confident license plate bounding boxes. This mechanism forms the core of \textit{Module 1}, enabling real-time localization in multi-vehicle scenes.}
@@ -138,11 +138,46 @@
 	
 	\subsection{\textit{Image Quality Assessment and Routing (Module 2)}}
 	
+	This module represents the core component of the proposed adaptive framework. Instead of processing every detected plate uniformly, this module functions as an intelligent router. Its primary task is to perform Blind Image Quality Assessment (BIQA), a concept explored in various deep learning contexts \cite{simone2017,nima2018}, to determine the optimal subsequent processing path. This adaptive routing is critical for both maximizing accuracy and optimizing computational throughput.
 	
-
+	\subsubsection{Model Selection for High-Throughput Routing}
+	
+	The QAM must be exceptionally fast, as it analyzes every detected plate. A heavy or slow model at this stage would create a significant bottleneck for the entire system. Therefore, a lightweight Convolutional Neural Network (CNN) is required, echoing recent trends in efficient IQA model design \cite{lariqa,javad2025}.
+	
+	We have selected \textbf{MobileNetV3} as the backbone for this module. MobileNetV3 is specifically engineered for high performance in resource-constrained environments \cite{Qian2021MobileNetV3FI}. It achieves its efficiency through novel architectural components such as the inverted residual linear bottleneck, a concept introduced in MobileNetV2 \cite{Sandler2018MobileNetV2IR} and refined with h-swish activation functions. This architecture, detailed in Figure-\ref{fig:mobilenet_architec}, provides a superior trade-off between accuracy and latency, making it an ideal choice for our rapid classification task.
+	
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=\linewidth, height=7.5cm]{Images/image_4.png}
+		\caption{The general architecture of MobileNetV3, illustrating the inverted residual linear bottleneck blocks that enable its computational efficiency \cite{Qian2021MobileNetV3FI}}
+		\label{fig:mobilenet_architec}
+	\end{figure}
+	
+	\subsubsection{Classification Task and Routing Logic}
+	
+	The QAM is trained as a 3-class classifier, receiving the cropped license plate image from Module 1 and assigning it to one of three distinct categories:
+	
+	\begin{enumerate}
+		\item \textbf{``Clear'':} Images with high resolution, sharp focus, and no significant geometric distortion.
+		\item \textbf{``Restorable'':} Images with moderate degradation (e.g., motion blur, glare, high skew angles) but still containing sufficient underlying information for successful restoration.
+		\item \textbf{``Unrestorable'':} Images that are severely degraded (e.g., extreme low resolution, heavy occlusion, or complete motion blur) where recovery is deemed impossible.
+	\end{enumerate}
+	
+	This classification directly dictates the "adaptive" routing logic of the pipeline, as illustrated in Figure-\ref{fig:module2_pipeline}.
+	
+	\begin{itemize}
+		\item \textbf{``Clear''} images bypass the restoration module entirely and are sent directly to Module 4 (Character Recognition), saving computational resources.
+		\item \textbf{``Restorable''} images are forwarded to Module 3 (Conditional Image Restoration) for enhancement.
+		\item \textbf{``Unrestorable''} images are rejected (Removed) from the pipeline, preventing the system from processing "garbage" data and producing a highly confident but incorrect result.
+	\end{itemize}
+	
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=\linewidth]{Images/image_3.png}
+		\caption{The 3-branch conditional routing logic of the QAM. Based on the classification, an image is either sent for recognition, restoration, or removed}
+		\label{fig:module2_pipeline}
+	\end{figure}
 	\section{CONCLUSION}
-	
-	
 	
 	\section{REFERENCES}	
 	\begingroup
