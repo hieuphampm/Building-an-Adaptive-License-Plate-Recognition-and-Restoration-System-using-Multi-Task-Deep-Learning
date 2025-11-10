@@ -65,25 +65,23 @@
 	
 	\subsection{\textit{License plate detection}}
 	
-	Despite these advancements, existing detectors assume relatively clean input images and do not adapt to severe degradations prevalent in Vietnamese traffic surveillance systems, including extreme viewpoint angles, specular glare, motion blur, and low-resolution sensors~\cite{TranAnh2023LicensePR}. For instance, while segmentation-based methods on edge devices~\cite{Nguyen2025AnIO} and OpenALPR adaptations~\cite{openalpr2023} have been proposed for local deployment, they remain vulnerable to real-world distortions—particularly under extreme illumination variations such as daytime specular reflections from sunlight and nighttime low-contrast imaging due to poor lighting or headlight glare. Moreover, none incorporate pre-processing quality assessment to filter or route degraded inputs prior to recognition. This critical limitation motivates our use of \textit{YOLOv8-nano} \cite{Yaseen2024WhatIY}—building on the robust real-time detection foundation of YOLO~\cite{redmon2016}—augmented with a novel \textit{Quality Assessment Module (QAM)} to enable adaptive downstream processing.
+	Despite these advancements, existing detectors assume relatively clean input images and do not adapt to severe degradations prevalent in Vietnamese traffic surveillance systems, including extreme viewpoint angles, specular glare, motion blur, and low-resolution sensors~\cite{TranAnh2023LicensePR}. For instance, while segmentation-based methods on edge devices~\cite{Nguyen2025AnIO} and OpenALPR adaptations~\cite{openalpr2023} have been proposed for local deployment, they remain vulnerable to real-world distortions—particularly under extreme illumination variations such as daytime specular reflections from sunlight and nighttime low-contrast imaging due to poor lighting or headlight glare. Moreover, none incorporate pre-processing quality assessment to filter or route degraded inputs prior to recognition. This critical limitation motivates our proposed adaptive architecture. Our framework first employs a robust detector (YOLOv8-nano \cite{Yaseen2024WhatIY}...) and then introduces a novel Quality Assessment Module (QAM) as a distinct downstream processing step to route inputs.
 	
 	\subsection{\textit{Image quality assessment and routing}}
 	
-	Assessing the quality of detected license plate images is crucial for robust ALPR under real-world degradations. No-reference image quality assessment (NR-IQA) methods have gained prominence due to their applicability without pristine references. Early deep learning approaches leveraged CNNs to predict perceptual quality scores~\cite{simone2017,nima2018}, while recent works incorporate geometric priors~\cite{shin2024} or lightweight architectures for efficiency~\cite{lariqa}. These methods, however, are primarily designed for \textit{general image aesthetics or distortion classification}, not for \textit{task-specific routing} in ALPR pipelines.
+	Assessing the quality of detected license plate images is crucial for robust ALPR under real-world degradations. No-reference image quality assessment (NR-IQA) methods have gained prominence due to their applicability without pristine references. Early deep learning approaches leveraged CNNs to predict perceptual quality scores \cite{simone2017,nima2018}, while recent works incorporate geometric priors \cite{shin2024} or lightweight architectures for efficiency \cite{lariqa}. These methods, however, are primarily designed for general image aesthetics or distortion classification, not for task-specific routing in ALPR pipelines.
 	
-	Illumination extremes pose a particularly acute challenge: daytime glare saturates plate regions, while nighttime captures suffer from noise and low signal-to-noise ratio (SNR). Although specialized enhancement models like \textit{U-Net}-based day/night preprocessing have been explored~\cite{Chowdhury2019ANU}, they are applied uniformly and cannot distinguish between recoverable and irreparable degradation—leading to unnecessary computation or persistent OCR failures.
+	Illumination extremes pose a particularly acute challenge: daytime glare saturates plate regions, while nighttime captures suffer from noise and low signal-to-noise ratio (SNR). Although specialized enhancement models like U-Net-based day/night preprocessing have been explored \cite{Chowdhury2019ANU}, they are applied uniformly and cannot distinguish between recoverable and irreparable degradation—leading to unnecessary computation or persistent OCR failures.
 	
-	To enable adaptive processing, we require a lightweight, real-time classifier capable of categorizing plate images into ``\textit{clear}'', ``\textit{restorable}'', or ``\textit{unrestorable}''. Among candidate backbones—ResNet50, MobileNetV2~\cite{Sandler2018MobileNetV2IR}, \textit{EfficientNet-B0}~\cite{Tan2019EfficientNetRM}, and \textit{MobileNetV3}~\cite{Qian2021MobileNetV3FI}—\textit{MobileNetV3-Small} was selected due to its superior efficiency on edge devices, achieving 3.2× fewer parameters and 2.8× lower FLOPs than \textit{EfficientNet-B0} while maintaining comparable classification accuracy in no-reference distortion tasks. Fine-tuned on a synthetic dataset of multi Vietnamese license plates with controlled blur, noise, compression, and day/night illumination artifacts, our \textit{Quality Assessment Module (QAM)} dynamically routes inputs: clear plates proceed directly to OCR, restorable ones are forwarded to the conditional restoration module, and unrestorable cases are rejected to prevent error propagation.
-	
-	Although multi-angle detection models have been proposed~\cite{TranAnh2023LicensePR}, \textit{none integrate real-time quality evaluation with conditional, illumination-aware restoration}. Our multi-branch design addresses this gap by optimizing both accuracy and computational efficiency across diurnal cycles.
+	Although multi-angle detection model have been proposed \cite{TranAnh2023LicensePR}, none integrate real-time quality evaluation with conditional, illumination-aware restoration. Our multi-branch design addresses this gap by optimizing both accuracy and computational efficiency across diurnal cycles.
 	
 	\subsection{\textit{Conditional image restoration}}
 	
-	Restoring degraded license plate images is essential for improving OCR accuracy in low-quality inputs. Classical techniques, such as noise modeling and blur estimation~\cite{maru2017}, rely on hand-crafted priors and perform poorly under complex, compound distortions. Traditional machine learning approaches~\cite{singhal2025} offer marginal improvements but lack generalization. The advent of deep learning has introduced more powerful paradigms: convolutional neural networks (CNNs)~\cite{liu2024,singhal2025} capture local patterns effectively but suffer from limited receptive fields; \textit{Transformer}-based models~\cite{liang2021swinir,agnolucci2022,conde2022swin2sr,singhal2025} excel at modeling long-range dependencies through self-attention, though vanilla Vision Transformers (ViT) incur prohibitive computational cost on high-resolution inputs. Advanced generative methods, including GANs and diffusion models~\cite{singhal2025}, achieve state-of-the-art perceptual quality but risk introducing artifacts (e.g., hallucinated characters) and demand significant resources—unsuitable for real-time ALPR.
+	Restoring degraded license plate images is essential for improving OCR accuracy in low-quality inputs. Classical techniques, such as noise modeling and blur estimation \cite{maru2017}, rely on hand-crafted priors and perform poorly under complex, compound distortions. Traditional machine learning approaches \cite{singhal2025} offer marginal improvements but lack generalization.
 	
-	For conditional restoration in resource-constrained environments, lightweight efficiency and fidelity are paramount. Among \textit{Transformer}-based restoration backbones, \textit{Swin2SR}~\cite{conde2022swin2sr} stands out by combining the hierarchical \textit{Swin Transformer V2} with compressed image super-resolution objectives, enabling efficient processing of low-resolution, blurry, or noisy inputs while preserving textual integrity. Fine-tuned on synthetically degraded Vietnamese license plates, \textit{Swin2SR} is selectively applied only to ``restorable'' images identified by the QAM, bypassing clear plates to minimize latency and preventing artifact-induced OCR failures in unrestorable cases.
+	The advent of deep learning has introduced more powerful paradigms: convolutional neural networks (CNNs) \cite{liu2024,singhal2025} capture local patterns effectively but suffer from limited receptive fields; Transformer-based models \cite{liang2021swinir, agnolucci2022, conde2022swin2sr, singhal2025} excel at modeling long-range dependencies through self-attention, though vanilla Vision Transformers (ViT) incur prohibitive computational cost on high-resolution inputs. Advanced generative methods, including GANs and diffusion models \cite{singhal2025}, achieve state-of-the-art perceptual quality but risk introducing artifacts (e.g., hallucinated characters) and demand significant resources—unsuitable for real-time ALPR.
 	
-	Despite extensive progress in general image restoration~\cite{singhal2025}, no prior ALPR system integrates task-aware quality routing with conditional, text-preserving restoration. This gap underscores the novelty of our adaptive pipeline.
+	Despite extensive progress in general image restoration \cite{singhal2025}, no prior ALPR system integrates task-aware quality routing with conditional, text-preserving restoration. This gap underscores the novelty of our adaptive pipeline.
 	
 	\subsection{\textit{Character recognition and retrieval}}
 	\label{related_m4}
@@ -145,7 +143,9 @@
 	
 	The QAM must be exceptionally fast, as it analyzes every detected plate. A heavy or slow model at this stage would create a significant bottleneck for the entire system. Therefore, a lightweight Convolutional Neural Network (CNN) is required, echoing recent trends in efficient IQA model design \cite{lariqa,javad2025}.
 	
-	We have selected \textbf{MobileNetV3} as the backbone for this module. MobileNetV3 is specifically engineered for high performance in resource-constrained environments \cite{Qian2021MobileNetV3FI}. It achieves its efficiency through novel architectural components such as the inverted residual linear bottleneck, a concept introduced in MobileNetV2 \cite{Sandler2018MobileNetV2IR} and refined with h-swish activation functions. This architecture, detailed in Figure-\ref{fig:mobilenet_architec}, provides a superior trade-off between accuracy and latency, making it an ideal choice for our rapid classification task.
+	To enable this adaptive processing, we evaluated several candidate backbones: ResNet50, MobileNetV2 \cite{Sandler2018MobileNetV2IR}, EfficientNet-B0 \cite{Tan2019EfficientNetRM}, and MobileNetV3 \cite{Qian2021MobileNetV3FI}. We selected MobileNetV3-Small due to its superior efficiency on edge devices, achieving 3.2$\times$ fewer parameters and 2.8$\times$ lower FLOPs than EfficientNet-B0 while maintaining comparable classification accuracy.
+	
+	This model is specifically engineered for high performance in resource-constrained environments \cite{Qian2021MobileNetV3FI}. It achieves its efficiency through novel architectural components such as the inverted residual linear bottleneck, a concept introduced in MobileNetV2 \cite{Sandler2018MobileNetV2IR} and refined with h-swish activation functions. This architecture, detailed in Figure~\ref{fig:mobilenet_architec}, provides a superior trade-off between accuracy and latency, making it an ideal choice for our rapid classification task.
 	
 	\begin{figure}[H]
 		\centering
@@ -180,6 +180,17 @@
 	\end{figure}
 	
 	\subsection{\textit{Conditional Image Restoration (Module 3)}}
+	
+	This module is only activated when QAM (Module 2) classifies an image as "Restorable". Its main goal is not to produce an aesthetically pleasing image, but to produce a text-legible image, in particular preserving textual integrity and avoiding the creation of hallucinated artifacts.
+	
+	\subsubsection{Model Selection}
+	As analyzed in Section 2.3 (Related Work), GAN and Diffusion models, although powerful, have the risk of fabricating details, an unacceptable risk for OCR. Therefore, we need an efficient Transformer-based model.
+	
+	We chose Swin2SR \cite{conde2022swin2sr} as the backbone architecture for this module. Swin2SR combines the hierarchical Swin Transformer V2 architecture with compression super-resolution targets, making it ideal for our constraints:
+	\begin{enumerate}
+		\item \textbf{Efficiency}: It is designed for efficient processing, suitable for the requirements of a multi-stage pipeline.
+	\end{enumerate}
+	
 	\subsection{\textit{Character Recognition and Retrieval (Module 4)}}
 	
 	The final module is responsible for transcribing the character string from the processed plate images (either "clear" originals or "restored" outputs from Module 3).
@@ -189,6 +200,9 @@
 	Therefore, to maximize accuracy, we adopt a state-of-the-art, Transformer-based backbone: PARSeq \cite{Bautista2022SceneTR}. By leveraging the parallel and context-aware nature of Transformer attention mechanisms, PARSeq is inherently more robust to the partial occlusions, geometric skew, and artifacts that our restoration module may not have perfectly corrected. This choice aligns with the state-of-the-art in text recognition, which favors Transformer architectures for their superior performance \cite{Fang2021ReadLH}.
 	
 	To address the "general-purpose" limitation identified in our Related Work (Section-\ref{related_m4}), we do not use the pre-trained PARSeq model directly. Instead, the model is extensively fine-tuned on a mixed dataset of real and synthetically degraded Vietnamese plates. This critical step adapts the powerful general architecture to the specific typographic and contextual rules of the Vietnamese ALPR domain.
+	
+	
+	
 	\section{CONCLUSION}
 	
 	\section{REFERENCES}	
