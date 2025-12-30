@@ -1,0 +1,137 @@
+\begin{thebibliography}{10}
+
+\bibitem{TranAnh2023LicensePR}
+D.~Tran-Anh, K.~L. Tran, and H.-N. Vu, ``License plate recognition based on
+  multi-angle view model,'' {\em ArXiv}, vol.~abs/2309.12972, 2023.
+
+\bibitem{Nguyen2025AnIO}
+D.~D. Nguyen, T.~S. Vo, M.~H. Le, and M.-S. Nguyen, ``An integration of
+  segmentation technique on edge devices for license plate recognition,'' {\em
+  Ministry of Science and Technology, Vietnam}, 2025.
+
+\bibitem{openalpr2023}
+H.~Tran, G.~Ma, T.~Nguyen, and T.~Cao, ``Building vietnam's license plate
+  recognition system based on openalpr,'' {\em International Journal of
+  Multidisciplinary Research and Publications}, 2023.
+
+\bibitem{Yaseen2024WhatIY}
+M.~Yaseen, ``What is yolov8: An in-depth exploration of the internal features
+  of the next-generation object detector,'' {\em ArXiv}, vol.~abs/2408.15857,
+  2024.
+
+\bibitem{simone2017}
+S.~Bianco, L.~Celona, P.~Napoletano, and R.~Schettini, ``On the use of deep
+  learning for blind image quality assessment,'' {\em arXiv preprint
+  arXiv:1602.05531}, April 2017.
+
+\bibitem{nima2018}
+H.~Talebi and P.~Milanfar, ``Nima: Neural image assessment,'' {\em arXiv
+  preprint arXiv:1709.05424}, April 2018.
+
+\bibitem{shin2024}
+N.-H. Shin, S.-H. Lee, and C.-S. Kim, ``Blind image quality assessment based on
+  geometric order learning,'' pp.~12799--12808, 2024.
+
+\bibitem{lariqa}
+N.~B. Nasim Jamshidi~Avanaki, Abhijay~Ghildyal and S.~Zadtootaghaj, ``Lar-iqa:
+  A lightweight, accurate, and robust no-reference image quality assessment
+  model,'' {\em arXiv preprint arXiv:2408.17057v2}, September 2024.
+
+\bibitem{Chowdhury2019ANU}
+P.~N. Chowdhury, P.~Shivakumara, R.~Raghavendra, U.~Pal, T.~Lu, and
+  M.~Blumenstein, ``A new u-net based license plate enhancement model in night
+  and day images,'' in {\em Asian Conference on Pattern Recognition}, 2019.
+
+\bibitem{maru2017}
+M.~Maru and M.~C. Parikh, ``Image restoration techniques: A survey,'' February
+  2017.
+
+\bibitem{singhal2025}
+P.~K. H. S. A.~T. Nikita~Singhal, Anup~Kadam and Pranay, ``Study of recent
+  image restoration techniques: A comprehensive survey,'' June 2025.
+
+\bibitem{liu2024}
+Y.~L. E. B. M.~D. Peng~Liu, Xiaoxiao~Zhou and R.~Fang, ``Image restoration
+  using deep regulated convolutional networks,'' {\em arXiv preprint
+  arXiv:1910.08853v2}, June 2024.
+
+\bibitem{liang2021swinir}
+J.~Liang, J.~Cao, G.~Sun, K.~Zhang, L.~Van~Gool, and R.~Timofte, ``Swinir:
+  Image restoration using swin transformer,'' {\em arXiv preprint
+  arXiv:2108.10257}, August 2021.
+
+\bibitem{agnolucci2022}
+L.~Agnolucci, L.~Galteri, M.~Bertini, and A.~D. Bimbo, ``Restoration of analog
+  videos using swin-unet,'' in {\em Proceedings of the ACM International
+  Conference on Multimedia (ACM MM)}, 2022.
+
+\bibitem{conde2022swin2sr}
+M.~V. Conde, U.-J. Choi, M.~Burchi, and R.~Timofte, ``{S}win2{SR}: Swinv2
+  transformer for compressed image super-resolution and restoration,'' in {\em
+  Proceedings of the European Conference on Computer Vision (ECCV) Workshops},
+  2022.
+
+\bibitem{Shi2015AnET}
+B.~Shi, X.~Bai, and C.~Yao, ``An end-to-end trainable neural network for
+  image-based sequence recognition and its application to scene text
+  recognition,'' {\em IEEE Transactions on Pattern Analysis and Machine
+  Intelligence}, vol.~39, pp.~2298--2304, 2015.
+
+\bibitem{Li2021TrOCRTO}
+M.~Li, T.~Lv, L.~Cui, Y.~Lu, D.~A.~F. Flor{\^e}ncio, C.~Zhang, Z.~Li, and
+  F.~Wei, ``Trocr: Transformer-based optical character recognition with
+  pre-trained models,'' {\em ArXiv}, vol.~abs/2109.10282, 2021.
+
+\bibitem{Huang2022SwinTextSpotterST}
+M.~Huang, Y.~Liu, Z.~Peng, C.~Liu, D.~Lin, S.~Zhu, N.~J. Yuan, K.~Ding, and
+  L.~Jin, ``Swintextspotter: Scene text spotting via better synergy between
+  text detection and text recognition,'' {\em 2022 IEEE/CVF Conference on
+  Computer Vision and Pattern Recognition (CVPR)}, pp.~4583--4593, 2022.
+
+\bibitem{Bautista2022SceneTR}
+D.~Bautista and R.~Atienza, ``Scene text recognition with permuted
+  autoregressive sequence models,'' in {\em European Conference on Computer
+  Vision}, 2022.
+
+\bibitem{Tan2019EfficientNetRM}
+M.~Tan and Q.~V. Le, ``Efficientnet: Rethinking model scaling for convolutional
+  neural networks,'' {\em ArXiv}, vol.~abs/1905.11946, 2019.
+
+\bibitem{javad2025}
+J.~H. Joloudari, B.~Mesbahzadeh, O.~Zare, E.~Arslan, R.~Alizadehsani, and
+  H.~Moosaei, ``No-reference image contrast assessment with customized
+  efficientnet-b0,'' {\em arXiv preprint arXiv:2509.21967}, 2025.
+
+\bibitem{Yu2023SceneTR}
+W.~Yu, M.~Ibrayim, and A.~Hamdulla, ``Scene text recognition based on improved
+  crnn,'' {\em Inf.}, vol.~14, p.~369, 2023.
+
+\bibitem{redmon2016}
+J.~Redmon, S.~Divvala, R.~Girshick, and A.~Farhadi, ``You only look once:
+  Unified, real-time object detection,'' in {\em Proceedings of the IEEE
+  Conference on Computer Vision and Pattern Recognition (CVPR)}, 2016.
+
+\bibitem{Sandler2018MobileNetV2IR}
+M.~Sandler, A.~G. Howard, M.~Zhu, A.~Zhmoginov, and L.-C. Chen, ``Mobilenetv2:
+  Inverted residuals and linear bottlenecks,'' {\em 2018 IEEE/CVF Conference on
+  Computer Vision and Pattern Recognition}, pp.~4510--4520, 2018.
+
+\bibitem{Qian2021MobileNetV3FI}
+S.~Qian, C.~Ning, and Y.~Hu, ``Mobilenetv3 for image classification,'' {\em
+  2021 IEEE 2nd International Conference on Big Data, Artificial Intelligence
+  and Internet of Things Engineering (ICBAIE)}, pp.~490--497, 2021.
+
+\bibitem{He2015DeepRL}
+K.~He, X.~Zhang, S.~Ren, and J.~Sun, ``Deep residual learning for image
+  recognition,'' {\em 2016 IEEE Conference on Computer Vision and Pattern
+  Recognition (CVPR)}, pp.~770--778, 2015.
+
+\bibitem{Gonzalez2018DigitalIP}
+R.~C. Gonzalez and R.~E. Woods, {\em Digital Image Processing}.
+\newblock Pearson, 4th~ed., 2018.
+
+\bibitem{Shorten2019ASO}
+C.~Shorten and T.~M. Khoshgoftaar, ``A survey on image data augmentation for
+  deep learning,'' {\em Journal of Big Data}, vol.~6, pp.~1--48, 2019.
+
+\end{thebibliography}

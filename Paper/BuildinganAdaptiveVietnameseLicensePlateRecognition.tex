@@ -39,9 +39,7 @@
 	\maketitle
 	
 	\begin{abstract}
-		Automatic License Plate Recognition (ALPR) is an essential component of intelligent transportation, yet its performance is often significantly degraded by real-world image distortions and regional plate format complexities. This research addresses these challenges by proposing a highly adaptive, multi-task deep learning framework specifically designed for the Vietnamese license plate context. The system targets the unique diversity of Vietnamese plates while robustly handling low-quality image inputs.
-		
-		The proposed framework operates as a multi-stage, conditional pipeline. First, a real-time object detection model is employed to localize all license plate instances. The core component of the system is a lightweight Quality Assessment Module (QAM), which acts as an intelligent router, analyzing and classifying each detected plate into one of three distinct categories: ``clear'', ``restorable'', or ``unrestorable''. The system's adaptive nature is demonstrated in the subsequent multi-branch routing: ``restorable'' images are selectively forwarded to a specialized restoration neural network. Conversely, ``clear'' images bypass this resource-intensive step. Finally, ``unrestorable'' images are rejected entirely, preventing erroneous processing and optimizing overall system throughput. A robust Optical Character Recognition (OCR) model is then used to transcribe the character string from both ``clear'' and successfully ``restored'' plates. Finally, the recognized string is used as a query key for retrieving vehicle information from an associated database. This multi-task approach—integrating detection, quality assessment, conditional restoration, and recognition—demonstrates significant accuracy improvements under challenging real-world conditions compared to traditional, non-adaptive pipelines. The system provides a robust and efficient solution for practical ALPR and information retrieval applications within the specific context of Vietnam.
+		Automatic License Plate Recognition (ALPR) is an essential component of intelligent transportation, yet its performance is often significantly degraded by real-world image distortions and regional plate format complexities. This research addresses these challenges by proposing a highly adaptive, multi-task deep learning framework specifically designed for the Vietnamese license plate context. The system targets the unique diversity of Vietnamese plates while robustly handling low-quality image inputs through a multi-stage, conditional pipeline. First, a real-time object detection model localizes all license plate instances. The core component is a lightweight Quality Assessment Module (QAM), which acts as an intelligent router, classifying each plate as ``clear'', ``restorable'', or ``unrestorable''. Based on this assessment, ``restorable'' images are selectively forwarded to a Swin2SR-based restoration network, while ``clear'' images bypass this step to optimize throughput, and ``unrestorable'' inputs are discarded. Finally, a Transformer-based Optical Character Recognition (OCR) model transcribes the characters to retrieve vehicle information. Experimental evaluations confirm the effectiveness of this end-to-end adaptive strategy, achieving a Character Accuracy of 96.07\% and a Sequence Accuracy of 89.69\%. These results demonstrate significant robustness against real-world distortions compared to traditional monolithic pipelines, offering a practical and efficient solution for ALPR applications in Vietnam.
 	\end{abstract}
 	
 	\vspace{0.5em}
@@ -57,7 +55,7 @@
 	
 	However, the performance of conventional ALPR systems degrades significantly when deployed in unconstrained real-world environments. These systems often fail when faced with a wide spectrum of image quality issues, including motion blur from fast-moving vehicles, severe glare from headlights or sunlight, low-light noise, and geometric distortions from oblique camera angles.
 	
-	This research specifically addresses the challenges within the Vietnamese license plate context. This environment presents unique regional complexities, including a high diversity of plate formats, various background colors (e.g., white, blue, yellow), differing character layouts. A "one-size-fits-all" ALPR solution is often insufficient to handle this variability, leading to high error rates.
+	This research specifically addresses the challenges within the Vietnamese license plate context. This environment presents unique regional complexities, including a high diversity of plate formats, various background colors (e.g., white, blue, yellow), and differing character layouts. A "one-size-fits-all" ALPR solution is often insufficient to handle this variability, leading to high error rates.
 	
 	\section{RELATED WORK}
 	
@@ -79,7 +77,7 @@
 	
 	Illumination extremes pose a particularly acute challenge: daytime glare saturates plate regions, while nighttime captures suffer from noise and low signal-to-noise ratio (SNR). Although specialized enhancement models like U-Net-based day/night preprocessing have been explored \cite{Chowdhury2019ANU}, they are applied uniformly and cannot distinguish between recoverable and irreparable degradation—leading to unnecessary computation or persistent OCR failures.
 	
-	Although multi-angle detection model have been proposed \cite{TranAnh2023LicensePR}, none integrate real-time quality evaluation with conditional, illumination-aware restoration. Our multi-branch design addresses this gap by optimizing both accuracy and computational efficiency across diurnal cycles.
+	Although multi-angle detection model has been proposed \cite{TranAnh2023LicensePR}, none integrate real-time quality evaluation with conditional, illumination-aware restoration. Our multi-branch design addresses this gap by optimizing both accuracy and computational efficiency across diurnal cycles.
 	
 	\subsection{\textit{Conditional image restoration}}
 	
@@ -270,12 +268,18 @@
 		\label{fig:m3_architec}
 	\end{figure}
 	
-	\subsubsection{Implementation and Training Details}
+	\subsubsection{Technical Implementation}
+	
+	The restoration module was implemented using the PyTorch framework. The specific configurations and training strategies are detailed below:
 	
 	\begin{itemize}
 		\item \textbf{Input/Output}: The module accepts a degraded image patch $I_{deg} \in \mathbb{R}^{128 \times 64 \times 3}$ and outputs a rectified, clean image $I_{res} \in \mathbb{R}^{128 \times 64 \times 3}$.
-		\item \textbf{Loss Function}: To maximize character sharpness, we utilized the \textbf{L1 Loss} (Mean Absolute Error) during training. Unlike L2 Loss (MSE), which tends to produce overly smooth textures, L1 Loss effectively preserves the sharp edges required for OCR.
-		\item \textbf{Training Configuration}: The model was trained for \textbf{500 epochs} using the Adam optimizer with an initial learning rate of $2 \times 10^{-4}$ and a cosine annealing scheduler.
+		
+		\item \textbf{Loss Function}: To maximize character sharpness, we employed the \textbf{L1 Loss} (Mean Absolute Error). Unlike L2 Loss (MSE), which tends to produce overly smooth textures, L1 Loss effectively preserves the high-frequency edge details required for accurate OCR.
+		
+		\item \textbf{Training Configuration}: The model was trained for \textbf{500 epochs} using the Adam optimizer with an initial learning rate of $2 \times 10^{-4}$. We utilized a cosine annealing learning rate scheduler to stabilize convergence.
+		
+		\item \textbf{Model Selection}: The training process was monitored using the Peak Signal-to-Noise Ratio (PSNR) metric on a held-out validation set \cite{conde2022swin2sr}. The final model checkpoint was selected based on the best validation performance, achieving a PSNR of \textbf{27.39 dB}, which indicates a significant recovery of image quality sufficient for OCR legibility.
 	\end{itemize}
 	
 	\subsubsection{Experimental Results}
@@ -289,13 +293,7 @@
 		\includegraphics[width=\linewidth]{Images/m3_output_results.png}
 		\caption{Qualitative results of the Conditional Restoration Module. The top row displays degraded inputs classified as "Restorable", while the bottom row shows the corresponding outputs restored by Swin2SR, demonstrating enhanced clarity and legibility.}
 		\label{fig:m3_results}
-	\end{figure}
-	
-	\subsubsection{Implementation and Training Details}
-	The restoration module was implemented using PyTorch. We utilized the \textbf{L1 Loss} function (Mean Absolute Error) during training, as it promotes sharper edge reconstruction compared to L2 Loss (MSE), which tends to produce overly smooth textures.
-	
-	The model was trained for \textbf{500 epochs} using the Adam optimizer with an initial learning rate of $\mathbf{2 \times 10^{-4}}$. We employed a learning rate scheduler to stabilize convergence. The training process was monitored using the Peak Signal-to-Noise Ratio (PSNR) metric on a held-out validation set \cite{conde2022swin2sr}. The final model checkpoint was selected based on the best validation performance, achieving a PSNR of \textbf{27.39 dB}, which indicates a significant recovery of image quality sufficient for OCR readability.
-	
+	\end{figure}	
 
 	\subsection{\textit{Character Recognition and Retrieval (Module 4)}}
 	
