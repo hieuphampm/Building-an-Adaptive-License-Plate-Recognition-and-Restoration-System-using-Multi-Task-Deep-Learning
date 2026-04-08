@@ -1,7 +1,7 @@
 \documentclass[a4paper,11pt,twocolumn]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T5]{fontenc}
-\usepackage[english]{babel}
+
 \usepackage{mathptmx}
 \usepackage{geometry}
 \usepackage{graphicx}
@@ -10,10 +10,19 @@
 \usepackage{amsfonts}
 \usepackage{float}
 \usepackage{indentfirst}
+
+\usepackage[english,vietnamese]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T5]{fontenc}
+
 \setlength{\parindent}{15pt}
 
 \renewcommand{\thesection}{\Roman{section}.}
 \renewcommand{\thesubsection}{\arabic{section}.\arabic{subsection}}
+\addto\captionsvietnamese{
+	\renewcommand{\figurename}{Figure}
+	\renewcommand{\tablename}{Table}
+}
 
 \geometry{
 	a4paper,
@@ -38,12 +47,24 @@
 	\twocolumn[
 	\maketitle
 	
+	\selectlanguage{english}
+	\renewcommand{\abstractname}{Abstract}
+	
 	\begin{abstract}
 		Automatic License Plate Recognition (ALPR) is an essential component of intelligent transportation, yet its performance is often significantly degraded by real-world image distortions and regional plate format complexities. This research addresses these challenges by proposing a highly adaptive, multi-task deep learning framework specifically designed for the Vietnamese license plate context. The system targets the unique diversity of Vietnamese plates while robustly handling low-quality image inputs through a multi-stage, conditional pipeline. First, a real-time object detection model localizes all license plate instances. The core component is a lightweight Quality Assessment Module (QAM), which acts as an intelligent router, classifying each plate as ``clear'', ``restorable'', or ``unrestorable''. Based on this assessment, ``restorable'' images are selectively forwarded to a Swin2SR-based restoration network, while ``clear'' images bypass this step to optimize throughput, and ``unrestorable'' inputs are discarded. Finally, a Transformer-based Optical Character Recognition (OCR) model transcribes the characters to retrieve vehicle information. Experimental evaluations confirm the effectiveness of this end-to-end adaptive strategy, achieving a Character Accuracy of 96.07\% and a Sequence Accuracy of 89.69\%. These results demonstrate significant robustness against real-world distortions compared to traditional monolithic pipelines, offering a practical and efficient solution for ALPR applications in Vietnam.
 	\end{abstract}
 	
 	\vspace{0.5em}
 	\noindent\textbf{\small Keywords—} Vietnamese License plate recognition, multi-task learning, computer vision.
+	
+	\selectlanguage{vietnamese}
+	\renewcommand{\abstractname}{Tóm tắt}
+	\begin{abstract}
+		Nhận dạng biển số xe tự động (ALPR) là một thành phần trọng yếu trong hệ thống giao thông thông minh. Tuy nhiên, hiệu suất của các hệ thống này thường bị suy giảm nghiêm trọng do sự biến dạng của hình ảnh trong môi trường thực tế và sự phức tạp về định dạng biển số đặc thù của từng khu vực. Nghiên cứu này giải quyết các thách thức trên bằng cách đề xuất một khung kiến trúc học sâu đa nhiệm có khả năng thích ứng cao, được thiết kế chuyên biệt cho bối cảnh biển số xe tại Việt Nam. Hệ thống hướng tới việc xử lý sự đa dạng của biển số Việt Nam đồng thời giải quyết triệt để các đầu vào hình ảnh chất lượng thấp thông qua một quy trình xử lý phân tầng có điều kiện. Đầu tiên, một mô hình phát hiện vật thể thời gian thực được sử dụng để định vị tất cả các biển số xe. Thành phần cốt lõi của hệ thống là Mô-đun Đánh giá Chất lượng hạng nhẹ, hoạt động như một bộ định tuyến thông minh để phân loại từng biển số thành ba nhóm: "rõ nét", "có thể phục hồi", hoặc "không thể phục hồi". Dựa trên kết quả đánh giá này, các ảnh "có thể phục hồi" sẽ được điều hướng có chọn lọc qua mạng phục hồi ảnh sử dụng kiến trúc Swin2SR, trong khi các ảnh "rõ nét" sẽ bỏ qua bước này để tối ưu hóa tốc độ xử lý, và các ảnh "không thể phục hồi" sẽ bị loại bỏ. Cuối cùng, một mô hình Nhận dạng Ký tự Quang học dựa trên kiến trúc Transformer được sử dụng để nhận dạng chuỗi ký tự nhằm truy xuất thông tin phương tiện. Các đánh giá thực nghiệm đã khẳng định tính hiệu quả của chiến lược thích ứng đầu cuối này, đạt độ chính xác theo ký tự là 96.07\% và độ chính xác theo chuỗi là 89.69\%. Những kết quả này chứng minh khả năng hoạt động bền vững và vượt trội trước các biến dạng thực tế so với các mô hình xử lý tuyến tính truyền thống, mang lại một giải pháp thực tiễn và hiệu quả cho các ứng dụng ALPR tại Việt Nam.
+	\end{abstract}
+	
+	\vspace{0.5em}
+	\noindent\textbf{\small Từ khóa—} Nhận dạng biển số xe Việt Nam, học đa tác vụ, thị giác máy tính.
 	
 	\vspace{1em}
 	]
